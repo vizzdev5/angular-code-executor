@@ -10,33 +10,25 @@ import { CodeStorageService } from '../../services/code-storage.service';
 export class ExecutingButtonComponent {
   constructor(private codeStorage: CodeStorageService) {}
 
-  async execute() {
-    const codes = [
-      this.codeStorage.code1,
-      this.codeStorage.code2,
-      this.codeStorage.code3,
-      this.codeStorage.code4,
-    ];
-
-    for (let code of codes) {
-      if (code.trim()) {
-        try {
-          await this.executeCode(code);
-        } catch (error) {
-          console.error('Error executing code:', error);
-        }
-      }
-    }
+  execute(): void {
+    const codeBlocks = this.codeStorage.textInputs;
+    this.executeCodeBlock(codeBlocks, 0);
   }
 
-  executeCode(code: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        eval(code);
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    });
+  executeCodeBlock(codeBlocks: string[], index: number): void {
+    if (index >= codeBlocks.length) {
+      return;
+    }
+
+    const code = codeBlocks[index];
+    try {
+      eval(code);
+    } catch (error) {
+      console.error(`Error executing code block ${index + 1}:`, error);
+    }
+
+    setTimeout(() => {
+      this.executeCodeBlock(codeBlocks, index + 1);
+    }, 1000);
   }
 }
